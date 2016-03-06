@@ -43,6 +43,7 @@ public struct Regift {
     private let frameCount: Int
     private let delayTime: Float
     private let loopCount: Int
+    private var destinationFileURL: NSURL?
     
     /// Create a GIF from a movie stored at the given URL.
     ///
@@ -56,17 +57,27 @@ public struct Regift {
         self.loopCount = loopCount
     }
     
+    public init(sourceFileURL: NSURL, destinationFileURL: NSURL, frameCount: Int, delayTime: Float, loopCount: Int = 0) {
+        self.sourceFileURL = sourceFileURL
+        self.delayTime = delayTime
+        self.loopCount = loopCount
+        self.destinationFileURL = destinationFileURL
+        self.frameCount = frameCount
+    }
+    
     /// Get the URL of the GIF created with the attributes provided in the initializer.
     public func createGif() -> NSURL? {
-        let fileProperties = [kCGImagePropertyGIFDictionary as String:
-            [
-                kCGImagePropertyGIFLoopCount as String: loopCount
-            ]]
+
+        let fileProperties = [kCGImagePropertyGIFDictionary as String:[
+            kCGImagePropertyGIFLoopCount as String: NSNumber(int: Int32(loopCount))],
+            kCGImagePropertyGIFHasGlobalColorMap as String: NSValue(nonretainedObject: true)
+        ]
         
-        let frameProperties = [kCGImagePropertyGIFDictionary as String:
-            [
-                kCGImagePropertyGIFDelayTime as String: delayTime
-            ]]
+        let frameProperties = [
+            kCGImagePropertyGIFDictionary as String:[
+                kCGImagePropertyGIFDelayTime as String:delayTime
+            ]
+        ]
         
         let asset = AVURLAsset(URL: sourceFileURL, options: nil)
         
@@ -101,10 +112,18 @@ public struct Regift {
     /// :param: fileProperties The desired attributes of the resulting GIF.
     /// :param: frameProperties The desired attributes of each frame in the resulting GIF.
     public func createGIFForTimePoints(timePoints: [TimePoint], fileProperties: [String: AnyObject], frameProperties: [String: AnyObject], frameCount: Int) throws -> NSURL {
-        let temporaryFile = (NSTemporaryDirectory() as NSString).stringByAppendingPathComponent(Constants.FileName)
-        let fileURL = NSURL(fileURLWithPath: temporaryFile)
+
+        var fileURL:NSURL?
+        if self.destinationFileURL != nil {
+            fileURL = self.destinationFileURL
+            
+        } else {
+            let temporaryFile = (NSTemporaryDirectory() as NSString).stringByAppendingPathComponent(Constants.FileName)
+            fileURL = NSURL(fileURLWithPath: temporaryFile)
+            
+        }
         
-        guard let destination = CGImageDestinationCreateWithURL(fileURL, kUTTypeGIF, frameCount, nil) else {
+        guard let destination = CGImageDestinationCreateWithURL(fileURL!, kUTTypeGIF, frameCount, nil) else {
             throw RegiftError.DestinationNotFound
         }
         
@@ -136,6 +155,6 @@ public struct Regift {
             throw RegiftError.DestinationFinalize
         }
         
-        return fileURL
+        return fileURL!
     }
 }
