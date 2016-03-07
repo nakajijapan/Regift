@@ -70,7 +70,7 @@ public struct Regift {
 
         let fileProperties = [kCGImagePropertyGIFDictionary as String:[
             kCGImagePropertyGIFLoopCount as String: NSNumber(int: Int32(loopCount))]
-//            kCGImagePropertyGIFHasGlobalColorMap as String: NSValue(nonretainedObject: true)
+            kCGImagePropertyGIFHasGlobalColorMap as String: NSValue(nonretainedObject: true)
         ]
         
         let frameProperties = [
