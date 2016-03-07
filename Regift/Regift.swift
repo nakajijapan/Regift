@@ -69,8 +69,8 @@ public struct Regift {
     public func createGif() -> NSURL? {
 
         let fileProperties = [kCGImagePropertyGIFDictionary as String:[
-            kCGImagePropertyGIFLoopCount as String: NSNumber(int: Int32(loopCount))],
-            kCGImagePropertyGIFHasGlobalColorMap as String: NSValue(nonretainedObject: true)
+            kCGImagePropertyGIFLoopCount as String: NSNumber(int: Int32(loopCount))]
+//            kCGImagePropertyGIFHasGlobalColorMap as String: NSValue(nonretainedObject: true)
         ]
         
         let frameProperties = [
